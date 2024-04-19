@@ -1,0 +1,118 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Study Bites | A recipe finder for students</title>
+    <link rel="stylesheet" href="style.css">
+  <link rel="stylesheet" type="text/css" href="https://stackpath.bootstrapcdn.com/font-awesome/4.7.0/css/font-awesome.min.css">
+   <link rel="stylesheet" href="https://fonts.googleapis.com/css?family=Raleway">
+
+</head>
+<body>
+  <head>
+    <img src="pleasantLOGO.png" alt="studybitesLOGO" class="center" style="width: 400px; height: 400px;">
+    
+  </head>
+    <div class="indexcontainer">
+        <form id="searchForm">
+          <button type="submit" class="search-button"><i class="fa fa-search" aria-hidden="true"></i></button>
+           <input type="text" id="searchInput" class="search-bar" placeholder="eg. pies, desserts...">
+        </form>
+    </div>
+  
+  <div id="results"></div>
+
+<footer>
+  <div class="footcontainer">
+    <div class="SiteFooter"> <img src="plesantLOGOinvert.png" alt="invertedLOGO" class="center" style="width: 190px; height: 190px;">
+
+     <a href="https://www.instagram.com/studybites_1/?hl=en"> <img src="ig.png" alt="instagram" style="width: 25px; height: 25px;"> </a>
+
+      <a href="https://twitter.com/studybites_1234"> <img src="twitter.png" alt="twitter" style="width:40px; height: 40px;"> </a>
+
+      <a href="https://www.facebook.com/StudyBites1234/"> <img src="facebook.png" alt="facebook" style="width:40px; height: 40px;"> </a>
+      <br>
+
+    <a href="mailto: studybites.business@gmail.com" style="color: #f3efe0;"> email us at: studybites.business@gmail.com </a>
+
+      <p style="font-size: 7px; color: #a29f95;"> Study Bites, 2024©  | <a href="about.html" style="font-size: 7px; color: #a29f95;">About us</a> | <a href="index.html" style="font-size: 7px; color: #a29f95;">Home</a> </p>
+    </div>
+  </div>
+</footer>
+  
+    <script>
+        document.getElementById('searchForm').addEventListener('submit', function(event) {
+            event.preventDefault();
+            searchRecipes();
+        });
+
+        async function searchRecipes() {
+            const apiKey = '022bc2662bcc4737b9ff3dc0d7cd4966'; 
+            const searchQuery = document.getElementById('searchInput').value;
+            const apiUrl = `https://api.spoonacular.com/recipes/search?query=${searchQuery}&apiKey=${apiKey}&number=5`;
+
+            try {
+                const response = await fetch(apiUrl);
+                const data = await response.json();
+                displayRecipes(data.results);
+            } catch (error) {
+                console.error('Error fetching data:', error);
+            }
+        }
+
+        async function viewRecipe(id) {
+            const apiKey = '022bc2662bcc4737b9ff3dc0d7cd4966'; 
+            const apiUrl = `https://api.spoonacular.com/recipes/${id}/information?apiKey=${apiKey}`;
+
+            try {
+                const response = await fetch(apiUrl);
+                const data = await response.json();
+                openRecipeDetails(data);
+            } catch (error) {
+                console.error('Error fetching recipe details:', error);
+            }
+        }
+
+        function openRecipeDetails(recipeDetails) {
+            const recipeUrl = recipeDetails.sourceUrl;
+            window.open(recipeUrl, '_blank');
+        }
+
+
+        function displayRecipes(recipes) {
+            const resultsContainer = document.getElementById('results');
+            resultsContainer.innerHTML = '';
+
+            if (recipes.length === 0) {
+                resultsContainer.innerHTML = '<p>No recipes found.</p>';
+            } else {
+                recipes.forEach(recipe => {
+                    const recipeItem = document.createElement('div');
+                    recipeItem.classList.add('recipe-item');
+
+                    const title = document.createElement('p');
+                    title.classList.add('recipe-title');
+                    title.textContent = recipe.title;
+                    recipeItem.appendChild(title);
+
+                    if (recipe.image) {
+                        const image = document.createElement('img');
+                        image.classList.add('recipe-image');
+                        image.src = `https://img.spoonacular.com/recipes/${recipe.id}-312x231.jpg`;
+                        recipeItem.appendChild(image);
+                    }
+
+                    let viewRecipeButton = document.createElement('button');
+                    viewRecipeButton.classList.add('view-recipe-button');
+                    viewRecipeButton.textContent = 'View Recipe';
+                    viewRecipeButton.addEventListener('click', () => viewRecipe(recipe.id));
+                    recipeItem.appendChild(viewRecipeButton);
+
+                    resultsContainer.appendChild(recipeItem);
+                });
+            }
+        }
+    </script>
+</body>
+</html>
